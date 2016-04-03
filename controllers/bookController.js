@@ -20,7 +20,7 @@ var bookController = function(Book) {
 
 		if (req.query) {
 			query = Object.keys(req.query).filter(function(item) {
-				return queryWhiteList.includes(item);
+				return queryWhiteList.indexOf(item) > -1;
 			}).reduce(function(prev, current) {
 				prev[current] = req.query[current];
 
@@ -34,7 +34,17 @@ var bookController = function(Book) {
 				return;
 			}
 
-			res.json(books);
+			var returnBooks = books.map(function(item) {
+				var newBook = item.toJSON();
+
+				newBook.links = {
+					self: 'http://' + req.headers.host + '/api/books/' + newBook._id
+				};
+
+				return newBook;
+			});
+
+			res.json(returnBooks);
 		});
 	};
 
